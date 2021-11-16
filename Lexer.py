@@ -9,8 +9,8 @@ def formatText(text):
     for char in text:
         if (char.isspace() == False):
             current  = char
-            if (current.isalpha()):
-                if (prev.isalpha() or prev == '*'):
+            if (current.isalpha() or current == '('):
+                if (prev.isalpha() or prev == '*' or prev == ')'):
                     formatted =  f"{formatted}{CONCAT_OPERATOR}{current}"
                 else:
                     formatted += current
@@ -50,6 +50,10 @@ class Lexer:
                 return Token(current, TokenType.CONCATENATION_TOKEN)
             elif current == '|':
                 return Token(current, TokenType.UNION_TOKEN)
+            elif current == '(':
+                return Token(current, TokenType.LEFT_PARENTHESIS_TOKEN)
+            elif current == ')':
+                return Token(current, TokenType.RIGHT_PARENTHESIS_TOKEN)
             elif current == '\0':
                 return Token(current, -1)
         
