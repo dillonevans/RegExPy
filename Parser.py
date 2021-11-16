@@ -42,9 +42,11 @@ class Parser:
     def parsePrimary(self) -> SyntaxNode:
         currentToken = self.getCurrentToken()
         syntaxType = currentToken.type
+
         if (syntaxType == TokenType.CHARACTER):
             self.match(TokenType.CHARACTER)
             return CharacterNode(currentToken.text)
+            
         elif (syntaxType == TokenType.LEFT_PARENTHESIS_TOKEN):
             self.match(TokenType.LEFT_PARENTHESIS_TOKEN)
             tree = self.parseExpression(0)

@@ -6,11 +6,11 @@ class SyntaxNode(ABC):
     abstractclassmethod
     def evaluate(self) -> NFA:
         pass
-    def printTree(self) -> None:
+    def __str__(self) -> str:
         pass
 
 class BinaryOperator(Enum):
-    UNION = '|',
+    UNION = '|'
     CONCATENATION= '?'
 
 class UnaryOperator(Enum):
@@ -22,24 +22,34 @@ class BinaryOperatorNode(SyntaxNode):
         self.operator = operator
         self.right = right
 
-    def printTree(self) -> None:
-        self.left.printTree()
-        self.right.printTree()
-        print(self.operator.value, end = '')
+    def __str__(self) -> str:
+        return f"{self.left}{self.right}{self.operator.value}"
+
+    def evaluate(self) -> NFA:
+        if (self.operator == BinaryOperator.CONCATENATION):
+            concatenationNFA = NFA(False)
+            leftNFA = self.left.evaluate()
+            rightNFA = self.right.evaluate()
+            concatenationNFA.addTransition()
         
 class CharacterNode(SyntaxNode):
     def __init__(self, char: chr) -> None:
         self.char = char
 
-    def printTree(self) -> None:
-        print(self.char, end = '')
+    def __str__(self) -> str:
+        return f"{self.char}"
+
+    def evaluate(self) -> NFA:
+        startState, acceptState = NFA(False), NFA(True)
+        startState.addTransition(self.char, acceptState)
+        return startState
 
 class UnaryOperatorNode(SyntaxNode):
     def __init__(self, operator: UnaryOperator, operand: SyntaxNode) -> None:
         self.operator = operator
         self.operand = operand
 
-    def printTree(self) -> None:
-        self.operand.printTree()
-        print(self.operator.value, end = '')
+    def __str__(self) -> str:
+        return f"{self.operand}{self.operator.value}"
+
 
