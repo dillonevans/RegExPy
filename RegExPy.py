@@ -1,12 +1,7 @@
-EPS = "epsilon"
+from Parser import Parser, Lexer
+from SyntaxNode import printTree
+lexer = Lexer("ab|ba")
+parser = Parser(lexer)
 
-class DFA: 
-    def __init__(self) -> None:
-        self.isAcceptState = False 
-        self.list = [] 
-        
-p1 = DFA()
-p2 = DFA()
-p2.isAcceptState = True
-
-
+tree = parser.parseExpression(0)
+printTree(tree)
