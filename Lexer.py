@@ -3,6 +3,7 @@ from Token import Token, TokenType
 
 CONCAT_OPERATOR = '\u2022'
 
+# Handle implicit Concatenations
 def formatText(text):
     current, prev = '', ''
     formatted = ""

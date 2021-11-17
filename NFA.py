@@ -3,100 +3,74 @@ from copy import deepcopy
 EPS = "epsilon"
 
 class State:
-    def __init__(self, isAcceptState) -> None:
-        self.isAcceptState = isAcceptState
+    def __init__(self) -> None:
+        pass
 
     def __str__(self) -> str:
         return hex(id(self))
 
 class NFA:
-    def __init__(self, alphabet) -> None:
-        self.startState = None
-        self.acceptState = None
-        self.transitionFunction = {}
-        self.states = []
+    def __init__(self, alphabet, states, startState, acceptState) -> None:
+        self.startState = startState
+        self.acceptState = acceptState
+        self.transitionTable = {}
+        self.states = states
         self.alphabet = alphabet
 
+        # The transition function of an NFA is Q x Σ --> P(Q)
+        for state in states:
+            for symbol in alphabet:
+                self.transitionTable[(state, symbol)] = []
+
     def addTransition(self, fromState, input, toState: State) ->None:
-
-        if not self.transitionFunction: 
-            self.startState = fromState
-
-        if fromState not in self.states:
-            self.states.append(fromState)
-
-            for symbol in self.alphabet:
-                self.transitionFunction[(fromState, symbol)] = []
-
-        if toState not in self.states:
-            self.states.append(toState)
-            
-            for symbol in self.alphabet:
-                self.transitionFunction[(toState, symbol)] = []
-
-        self.transitionFunction[(fromState, input)].append(toState)
-
-        if (toState.isAcceptState): 
-            self.acceptState = toState
-
+        self.transitionTable[(fromState, input)].append(toState)
+    
 
 def concatenate(left: NFA, right: NFA) -> NFA:
-    merged = NFA(left.alphabet)
-    leftAcceptState = left.acceptState
-    rightStartState = right.startState
-    leftAcceptState.isAcceptState = False
+    merged = NFA(left.alphabet, left.states + right.states, left.startState, right.acceptState)
 
-    merged.startState = left.startState
-    merged.acceptState = right.acceptState
+    for d in (left.transitionTable, right.transitionTable):
+        for key, value in d.items():
+            for state in value:
+                merged.addTransition(key[0], key[1], state)
 
-    merged.transitionFunction =  {**left.transitionFunction, **right.transitionFunction}
-    merged.states = left.states + right.states
-    merged.addTransition(leftAcceptState, EPS, rightStartState)
+    merged.addTransition(left.acceptState, EPS, right.startState)
     return merged
 
 def union(left: NFA, right: NFA) -> NFA:
-    unionNFA = NFA(left.alphabet)
-    startState, acceptState = State(False), State(True)
 
-    leftStartState, rightStartState = left.startState, right.startState
-    leftAcceptState, rightAcceptState = left.acceptState, right.acceptState
+    startState, acceptState = State(), State()
+    states = left.states + right.states + [startState, acceptState]
+    unionNFA = NFA(left.alphabet, states, startState, acceptState)
 
-    leftAcceptState.isAcceptState = False
-    rightAcceptState.isAcceptState = False
+    for d in (left.transitionTable, right.transitionTable):
+        for key, value in d.items():
+            for state in value:
+                unionNFA.addTransition(key[0], key[1], state)
 
-    unionNFA.transitionFunction = {**left.transitionFunction, **right.transitionFunction}
-    unionNFA.states = left.states + right.states
-
-    unionNFA.startState = startState
-    unionNFA.acceptState = acceptState
-
-    unionNFA.addTransition(startState, EPS, leftStartState)
-    unionNFA.addTransition(startState, EPS, rightStartState)
-    unionNFA.addTransition(leftAcceptState, EPS, acceptState)
-    unionNFA.addTransition(rightAcceptState, EPS, acceptState)
+    unionNFA.addTransition(startState, EPS, left.startState)
+    unionNFA.addTransition(startState, EPS, right.startState)
+    unionNFA.addTransition(left.acceptState, EPS, acceptState)
+    unionNFA.addTransition(right.acceptState, EPS, acceptState)
 
     return unionNFA
     
 def kleeneStarClosure(nfa: NFA):
-    closureNFA = NFA(nfa.alphabet)
-    
-    closureStartState = State(False)
-    closureAcceptState = State(True)
-    closureNFA.startState = closureStartState
-    closureNFA.acceptState = closureAcceptState
-    closureNFA.states = nfa.states
+    closureStartState, closureAcceptState = State(), State()
+    states = [closureStartState, closureAcceptState]
+    closureNFA = NFA(nfa.alphabet, states + nfa.states, closureStartState, closureAcceptState)
 
-    closureNFA.transitionFunction = {**nfa.transitionFunction}
-    originalStartState, originalAcceptState = nfa.startState, nfa.acceptState
+    for key, value in nfa.transitionTable.items():
+        for state in value:
+            closureNFA.addTransition(key[0], key[1], state)
 
-    closureNFA.addTransition(closureStartState, EPS, originalStartState)
+    closureNFA.addTransition(closureStartState, EPS, nfa.startState)
     closureNFA.addTransition(closureStartState, EPS, closureAcceptState)
-    closureNFA.addTransition(originalAcceptState, EPS, originalStartState)
-    closureNFA.addTransition(originalAcceptState, EPS,closureAcceptState)
+    closureNFA.addTransition(nfa.acceptState, EPS, nfa.startState)
+    closureNFA.addTransition(nfa.acceptState, EPS,closureAcceptState)
     return closureNFA
 
 def kleenePlusClosure(nfa: NFA):
-
     return concatenate(nfa, kleeneStarClosure(deepcopy(nfa)))
     
 

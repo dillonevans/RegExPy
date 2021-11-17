@@ -1,10 +1,11 @@
 from abc import ABC, abstractclassmethod
 from enum import Enum
-from NFA import EPS, NFA, State, concatenate
+
+from Visitor import Visitor
 
 class SyntaxNode(ABC):
     abstractclassmethod
-    def evaluate(self) -> NFA:
+    def accept(self, visitor):
         pass
     def __str__(self) -> str:
         pass
@@ -24,6 +25,9 @@ class BinaryOperatorNode(SyntaxNode):
 
     def __str__(self) -> str:
         return f"{self.left}{self.right}{self.operator.value}"
+
+    def accept(self, visitor: Visitor):
+        return visitor.visitBinaryOperatorNode(self)
         
 class CharacterNode(SyntaxNode):
     def __init__(self, char: chr) -> None:
@@ -32,6 +36,8 @@ class CharacterNode(SyntaxNode):
     def __str__(self) -> str:
         return f"{self.char}"
 
+    def accept(self, visitor: Visitor):
+        return visitor.visitCharacterNode(self)
 
 class UnaryOperatorNode(SyntaxNode):
     def __init__(self, operator: UnaryOperator, operand: SyntaxNode) -> None:
@@ -40,5 +46,9 @@ class UnaryOperatorNode(SyntaxNode):
 
     def __str__(self) -> str:
         return f"{self.operand}{self.operator.value}"
+
+    def accept(self, visitor: Visitor):
+        return visitor.visitUnaryOperatorNode(self)
+
 
 

@@ -1,14 +1,16 @@
-from typing import final
 from Parser import Parser, Lexer
-from TreeToNFA import *
-lexer = Lexer("abc | ab")
+from ConvertToNFAVisitor import ConvertToNFAVisitor
+
+lexer = Lexer("abc|def")
 parser = Parser(lexer)
 
 tree = parser.parseExpression(0)
+print(tree)
+visitor = ConvertToNFAVisitor(lexer.alphabet)
 
-nfa = convertTreeToNFA(tree, lexer.alphabet)
-
-for key, value in nfa.transitionFunction.items():
-
+nfa = tree.accept(visitor)
+for key, value in nfa.transitionTable.items():
     if value:
         print(f"({key[0]}, {key[1]}) = {value}")
+
+print (nfa.acceptState)
