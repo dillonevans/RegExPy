@@ -1,6 +1,6 @@
 from abc import ABC, abstractclassmethod
 from enum import Enum
-from NFA import NFA
+from NFA import EPS, NFA, State, concatenate
 
 class SyntaxNode(ABC):
     abstractclassmethod
@@ -24,13 +24,6 @@ class BinaryOperatorNode(SyntaxNode):
 
     def __str__(self) -> str:
         return f"{self.left}{self.right}{self.operator.value}"
-
-    def evaluate(self) -> NFA:
-        if (self.operator == BinaryOperator.CONCATENATION):
-            concatenationNFA = NFA(False)
-            leftNFA = self.left.evaluate()
-            rightNFA = self.right.evaluate()
-            concatenationNFA.addTransition()
         
 class CharacterNode(SyntaxNode):
     def __init__(self, char: chr) -> None:
@@ -39,10 +32,6 @@ class CharacterNode(SyntaxNode):
     def __str__(self) -> str:
         return f"{self.char}"
 
-    def evaluate(self) -> NFA:
-        startState, acceptState = NFA(False), NFA(True)
-        startState.addTransition(self.char, acceptState)
-        return startState
 
 class UnaryOperatorNode(SyntaxNode):
     def __init__(self, operator: UnaryOperator, operand: SyntaxNode) -> None:

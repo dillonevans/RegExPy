@@ -1,3 +1,4 @@
+from NFA import EPS
 from Token import Token, TokenType
 
 CONCAT_OPERATOR = '\u2022'
@@ -25,6 +26,7 @@ class Lexer:
         self.text = text
         self.position = 0
         self.text = formatText(text)
+        self.alphabet = [EPS]
 
     def getCurrentChar(self) -> chr:
         return self.peek(0)
@@ -42,6 +44,9 @@ class Lexer:
         current = self.getCurrentChar()
         self.advance()
         if current.isalpha():
+            if current not in self.alphabet:
+                self.alphabet.append(current)
+
             return Token(current, TokenType.CHARACTER)
         else:
             if current == '*':
@@ -66,5 +71,3 @@ class Lexer:
             
     def hasReachedEOF(self):
         return self.position > len(self.text)
-
-    

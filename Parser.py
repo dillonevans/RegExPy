@@ -46,7 +46,7 @@ class Parser:
         if (syntaxType == TokenType.CHARACTER):
             self.match(TokenType.CHARACTER)
             return CharacterNode(currentToken.text)
-            
+
         elif (syntaxType == TokenType.LEFT_PARENTHESIS_TOKEN):
             self.match(TokenType.LEFT_PARENTHESIS_TOKEN)
             tree = self.parseExpression(0)
