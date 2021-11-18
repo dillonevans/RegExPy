@@ -1,7 +1,7 @@
 from Parser import Parser, Lexer
 from ConvertToNFAVisitor import ConvertToNFAVisitor
 
-lexer = Lexer("abc|def")
+lexer = Lexer("(a|b)*abb")
 parser = Parser(lexer)
 
 tree = parser.parseExpression(0)
