@@ -1,8 +1,9 @@
+from typing import Union
 from Visitor import Visitor
 from NFA import EPS, NFA
 from SyntaxNode import *
 
-class ConvertToNFAVisitor(Visitor):
+class ThompsonVisitor(Visitor):
 
     def __init__(self, alphabet) -> None:
         self.alphabet = alphabet
@@ -23,6 +24,8 @@ class ConvertToNFAVisitor(Visitor):
     def visitUnaryOperatorNode(self, node) -> NFA:
         if (node.operator == UnaryOperator.KLEENE_STAR):
             return self.kleeneStarClosure(node.operand.accept(self))
+        elif (node.operator == UnaryOperator.QUESTION):
+            return self.question(node.operand.accept(self))
         else:
             return self.kleenePlus(node.operand.accept(self))
 
@@ -80,3 +83,13 @@ class ConvertToNFAVisitor(Visitor):
         baseNFA = NFA(self.alphabet, [startState, acceptState], startState, acceptState,)
         baseNFA.addTransition(startState, node.char, acceptState)
         return baseNFA
+
+    def empty(self) -> NFA:
+        startState, acceptState = self.stateNum, self.stateNum + 1
+        self.stateNum += 2
+        baseNFA = NFA(self.alphabet, [startState, acceptState], startState, acceptState,)
+        baseNFA.addTransition(startState, EPS, acceptState)
+        return baseNFA
+    
+    def question(self, node) -> NFA:
+        return self.union(self.empty(), node)

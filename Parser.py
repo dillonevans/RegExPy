@@ -31,7 +31,7 @@ class Parser:
             return 0
 
     def isBinaryOperator(syntaxType: TokenType) -> bool:
-        return syntaxType == TokenType.CONCATENATION_TOKEN or syntaxType == TokenType.UNION_TOKEN
+        return syntaxType in [TokenType.CONCATENATION_TOKEN, TokenType.UNION_TOKEN]
    
     def getBinaryOperatorFromToken(syntax: TokenType) -> BinaryOperator:
         if (syntax == TokenType.CONCATENATION_TOKEN):
@@ -56,9 +56,11 @@ class Parser:
     def parsePostfix(self) -> SyntaxNode:
             node = self.parsePrimary()
             tokenType = self.getCurrentToken().type 
-            while(tokenType in [TokenType.KLEENE_CLOSURE_TOKEN, TokenType.KLEENE_PLUS_TOKEN]):
+            while(tokenType in [TokenType.KLEENE_CLOSURE_TOKEN, TokenType.KLEENE_PLUS_TOKEN, TokenType.QUESTION_TOKEN]):
                 if (tokenType == TokenType.KLEENE_CLOSURE_TOKEN):
                     node = UnaryOperatorNode(UnaryOperator.KLEENE_STAR, node)
+                elif (tokenType == TokenType.QUESTION_TOKEN):
+                    node = UnaryOperatorNode(UnaryOperator.QUESTION, node)
                 else:
                     node = UnaryOperatorNode(UnaryOperator.KLEENE_PLUS, node)
                 self.match(tokenType)

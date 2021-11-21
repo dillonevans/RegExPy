@@ -16,7 +16,8 @@ class BinaryOperator(Enum):
 
 class UnaryOperator(Enum):
     KLEENE_STAR = '*',
-    KLEENE_PLUS = '+'
+    KLEENE_PLUS = '+',
+    QUESTION = '?'
 
 class BinaryOperatorNode(SyntaxNode):
     def __init__(self, left: SyntaxNode, operator: BinaryOperator, right: SyntaxNode) -> None:

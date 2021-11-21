@@ -12,13 +12,14 @@ def formatText(text):
         if (char.isspace() == False):
             current  = char
             if (current.isalpha() or current == '('):
-                if (prev.isalpha() or prev in ['*', ')', '+']):
+                if (prev.isalpha() or prev in ['*', ')', '+', '?']):
                     formatted =  f"{formatted}{CONCAT_OPERATOR}{current}"
                 else:
                     formatted += current
             else:
                 formatted += current
             prev = current
+    print(formatted)
     return formatted
 
 class Lexer:
@@ -55,6 +56,8 @@ class Lexer:
                 return Token(current, TokenType.KLEENE_PLUS_TOKEN)
             elif current == CONCAT_OPERATOR:
                 return Token(current, TokenType.CONCATENATION_TOKEN)
+            elif current == '?':
+                return Token(current, TokenType.QUESTION_TOKEN)
             elif current == '|':
                 return Token(current, TokenType.UNION_TOKEN)
             elif current == '(':
