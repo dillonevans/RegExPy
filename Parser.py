@@ -55,9 +55,14 @@ class Parser:
 
     def parsePostfix(self) -> SyntaxNode:
             node = self.parsePrimary()
-            while(self.getCurrentToken().type == TokenType.KLEENE_CLOSURE_TOKEN):
-                node = UnaryOperatorNode(UnaryOperator.KLEENE_STAR, node)
-                self.match(TokenType.KLEENE_CLOSURE_TOKEN)
+            tokenType = self.getCurrentToken().type 
+            while(tokenType in [TokenType.KLEENE_CLOSURE_TOKEN, TokenType.KLEENE_PLUS_TOKEN]):
+                if (tokenType == TokenType.KLEENE_CLOSURE_TOKEN):
+                    node = UnaryOperatorNode(UnaryOperator.KLEENE_STAR, node)
+                else:
+                    node = UnaryOperatorNode(UnaryOperator.KLEENE_PLUS, node)
+                self.match(tokenType)
+                tokenType = self.getCurrentToken().type 
             return node
 
     def parseExpression(self, minPrecedence: int) -> SyntaxNode:

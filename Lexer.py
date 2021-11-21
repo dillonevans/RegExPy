@@ -12,14 +12,13 @@ def formatText(text):
         if (char.isspace() == False):
             current  = char
             if (current.isalpha() or current == '('):
-                if (prev.isalpha() or prev == '*' or prev == ')'):
+                if (prev.isalpha() or prev in ['*', ')', '+']):
                     formatted =  f"{formatted}{CONCAT_OPERATOR}{current}"
                 else:
                     formatted += current
             else:
                 formatted += current
             prev = current
-    print(formatted)
     return formatted
 
 class Lexer:
@@ -27,7 +26,7 @@ class Lexer:
         self.text = text
         self.position = 0
         self.text = formatText(text)
-        self.alphabet = [EPS]
+        self.alphabet = []
 
     def getCurrentChar(self) -> chr:
         return self.peek(0)
@@ -47,11 +46,13 @@ class Lexer:
         if current.isalpha():
             if current not in self.alphabet:
                 self.alphabet.append(current)
-
             return Token(current, TokenType.CHARACTER)
+
         else:
             if current == '*':
                 return Token(current, TokenType.KLEENE_CLOSURE_TOKEN)
+            elif current == '+':
+                return Token(current, TokenType.KLEENE_PLUS_TOKEN)
             elif current == CONCAT_OPERATOR:
                 return Token(current, TokenType.CONCATENATION_TOKEN)
             elif current == '|':

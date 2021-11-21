@@ -1,16 +1,16 @@
+from NFAToDFA import subsetConstruction
 from Parser import Parser, Lexer
 from ConvertToNFAVisitor import ConvertToNFAVisitor
+from NFA import EPS
 
-lexer = Lexer("(a|b)*abb")
-parser = Parser(lexer)
+def isMatch(string, regex) -> bool:
+    lexer = Lexer(regex)
+    parser = Parser(lexer)
+    tree = parser.parseExpression(0)
+    visitor = ConvertToNFAVisitor([*lexer.alphabet, EPS])
 
-tree = parser.parseExpression(0)
-print(tree)
-visitor = ConvertToNFAVisitor(lexer.alphabet)
+    nfa = tree.accept(visitor)
+    dfa = subsetConstruction(nfa, lexer.alphabet)
+    return dfa.accept(string)
 
-nfa = tree.accept(visitor)
-for key, value in nfa.transitionTable.items():
-    if value:
-        print(f"({key[0]}, {key[1]}) = {value}")
 
-print (nfa.acceptState)

@@ -15,7 +15,8 @@ class BinaryOperator(Enum):
     CONCATENATION= '?'
 
 class UnaryOperator(Enum):
-    KLEENE_STAR = '*'
+    KLEENE_STAR = '*',
+    KLEENE_PLUS = '+'
 
 class BinaryOperatorNode(SyntaxNode):
     def __init__(self, left: SyntaxNode, operator: BinaryOperator, right: SyntaxNode) -> None:

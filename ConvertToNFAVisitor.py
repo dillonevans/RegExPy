@@ -23,6 +23,9 @@ class ConvertToNFAVisitor(Visitor):
     def visitUnaryOperatorNode(self, node) -> NFA:
         if (node.operator == UnaryOperator.KLEENE_STAR):
             return self.kleeneStarClosure(node.operand.accept(self))
+        else:
+            return self.kleenePlus(node.operand.accept(self))
+
 
     def union(self, left, right) -> NFA:
         startState, acceptState = self.stateNum, self.stateNum + 1
@@ -67,6 +70,9 @@ class ConvertToNFAVisitor(Visitor):
         closureNFA.addTransition(nfa.acceptState, EPS, nfa.startState)
         closureNFA.addTransition(nfa.acceptState, EPS,closureAcceptState)
         return closureNFA
+
+    def kleenePlus(self, nfa: NFA):
+        return self.concatenate(nfa, self.kleeneStarClosure(nfa))
 
     def basicSymbol(self, node) -> NFA:
         startState, acceptState = self.stateNum, self.stateNum + 1
