@@ -1,12 +1,11 @@
-from typing import Union
 from Visitor import Visitor
 from NFA import EPS, NFA
 from SyntaxNode import *
 
 class ThompsonVisitor(Visitor):
-
-    def __init__(self, alphabet) -> None:
-        self.alphabet = alphabet
+    """Performs Thompson's Construction on the Parse Tree"""
+    
+    def __init__(self) -> None:
         self.stateNum = 0
 
     def visitCharacterNode(self, node) -> NFA:
@@ -28,13 +27,12 @@ class ThompsonVisitor(Visitor):
             return self.question(node.operand.accept(self))
         else:
             return self.kleenePlus(node.operand.accept(self))
-
-
+    
     def union(self, left, right) -> NFA:
         startState, acceptState = self.stateNum, self.stateNum + 1
         self.stateNum += 2
-        states = left.states + right.states + [startState, acceptState]
-        unionNFA = NFA(left.alphabet, states, startState, acceptState)
+        states = [*left.states, *right.states, startState, acceptState]
+        unionNFA = NFA(states, startState, acceptState)
 
         for d in (left.transitionTable, right.transitionTable):
             for key, value in d.items():
@@ -48,7 +46,8 @@ class ThompsonVisitor(Visitor):
         return unionNFA
 
     def concatenate(self, left: NFA, right: NFA) -> NFA:
-        merged = NFA(left.alphabet, left.states + right.states, left.startState, right.acceptState)
+        states = [*left.states, *right.states]
+        merged = NFA(states, left.startState, right.acceptState)
 
         for d in (left.transitionTable, right.transitionTable):
             for key, value in d.items():
@@ -61,8 +60,8 @@ class ThompsonVisitor(Visitor):
     def kleeneStarClosure(self, nfa: NFA) -> NFA:
         closureStartState, closureAcceptState = self.stateNum, self.stateNum + 1
         self.stateNum += 2
-        states = [closureStartState, closureAcceptState]
-        closureNFA = NFA(nfa.alphabet, states + nfa.states, closureStartState, closureAcceptState)
+        states = [*nfa.states, closureStartState, closureAcceptState]
+        closureNFA = NFA(states, closureStartState, closureAcceptState)
 
         for key, value in nfa.transitionTable.items():
             for state in value:
@@ -80,14 +79,14 @@ class ThompsonVisitor(Visitor):
     def basicSymbol(self, node) -> NFA:
         startState, acceptState = self.stateNum, self.stateNum + 1
         self.stateNum += 2
-        baseNFA = NFA(self.alphabet, [startState, acceptState], startState, acceptState,)
+        baseNFA = NFA([startState, acceptState], startState, acceptState,)
         baseNFA.addTransition(startState, node.char, acceptState)
         return baseNFA
 
     def empty(self) -> NFA:
         startState, acceptState = self.stateNum, self.stateNum + 1
         self.stateNum += 2
-        baseNFA = NFA(self.alphabet, [startState, acceptState], startState, acceptState,)
+        baseNFA = NFA([startState, acceptState], startState, acceptState,)
         baseNFA.addTransition(startState, EPS, acceptState)
         return baseNFA
     

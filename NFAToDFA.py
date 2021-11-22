@@ -11,20 +11,20 @@ def nullClosure(states: list, transitionTable):
 
     while stack:
         t = stack.pop()        
-
-        for state in transitionTable[t, EPS]:
-            u = state
-            if (u not in closure):
-                closure.add(u)
-                stack.append(u)
+        if ((t, EPS) in transitionTable.keys()):
+            for state in transitionTable[t, EPS]:
+                if (state not in closure):
+                    closure.add(state)
+                    stack.append(state)
 
     return closure
 
 def move(stateSet, symbol, transitionTable):
     moveSet = set()
     for state in stateSet:
-        for s in transitionTable[(state, symbol)]:
-            moveSet.add(s)
+        if ((state, symbol) in transitionTable.keys()):
+            for s in transitionTable[state, symbol]:
+                moveSet.add(s)
     return moveSet    
 
 def subsetConstruction(nfa: NFA, alphabet) -> DFA:

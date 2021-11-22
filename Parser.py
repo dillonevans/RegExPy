@@ -30,9 +30,11 @@ class Parser:
         else:
             return 0
 
+    @staticmethod
     def isBinaryOperator(syntaxType: TokenType) -> bool:
         return syntaxType in [TokenType.CONCATENATION_TOKEN, TokenType.UNION_TOKEN]
    
+    @staticmethod
     def getBinaryOperatorFromToken(syntax: TokenType) -> BinaryOperator:
         if (syntax == TokenType.CONCATENATION_TOKEN):
             return BinaryOperator.CONCATENATION

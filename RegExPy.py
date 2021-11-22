@@ -1,16 +1,15 @@
 from NFAToDFA import subsetConstruction
 from Parser import Parser, Lexer
 from ThompsonVisitor import ThompsonVisitor
-from NFA import EPS
 
 def isMatch(string, regex) -> bool:
     lexer = Lexer(regex)
     parser = Parser(lexer)
     tree = parser.parseExpression(0)
-    visitor = ThompsonVisitor([*lexer.alphabet, EPS])
+    visitor = ThompsonVisitor()
 
     nfa = tree.accept(visitor)
+    print(nfa.transitionTable)
     dfa = subsetConstruction(nfa, lexer.alphabet)
+    print(dfa.transitionFunction)
     return dfa.accept(string)
-
-
