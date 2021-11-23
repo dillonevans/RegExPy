@@ -8,12 +8,12 @@
  Regular Languages are closed under union, concatenation, and the kleene star. As a result, other operations are comprised
  of these closure properties. For instance,
 
- L(r+) = L(rr*) = L(r)L(r*) and L(r?) = L(ε | r) = L(ε) | L(r)
+ L(R+) = L(RR*) = L(R)L(R*) and L(R?) = L(ε | R) = L(ε) | L(R)
 
- 'r*'   => Match a regular expression r zero or more times\
- 'r+    => Match a regular expression r one or more times\
- 'r?'   => Match a regular expression r one or more times\
- 'rs'   => Concatenate two regular expressions\
- 'r|s'  => Match a regular expression r or s\
- '(rs)' => Group regular expression(s) together
+ 'R*'   => Match a regular expression r zero or more times\
+ 'R+    => Match a regular expression r one or more times\
+ 'R?'   => Match a regular expression r one or more times\
+ 'RS'   => Concatenate two regular expressions\
+ 'R|S'  => Match a regular expression r or s\
+ '(RS)' => Group regular expression(s) together
 
