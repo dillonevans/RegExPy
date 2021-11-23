@@ -49,10 +49,13 @@ class ThompsonVisitor(Visitor):
         states = [*left.states, *[state for state in right.states if state != right.startState]]
         merged = NFA(states, left.startState, right.acceptState)
 
+        print(right.acceptState)
         for d in (left.transitionTable, right.transitionTable):
             for key, value in d.items():
                 for state in value:
-                    if (key[0] == right.startState):
+                    if (state == right.startState):
+                        merged.addTransition(key[0], key[1], left.acceptState)
+                    elif (key[0] == right.startState):
                         merged.addTransition(left.acceptState, key[1], state)
                     else:
                         merged.addTransition(key[0], key[1], state)

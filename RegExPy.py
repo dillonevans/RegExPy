@@ -11,4 +11,5 @@ def isMatch(string, regex) -> bool:
     nfa = tree.accept(visitor)
     dfa = subsetConstruction(nfa, lexer.alphabet)
     dfa.printToFile()
+    nfa.printNFA()
     return dfa.accept(string)

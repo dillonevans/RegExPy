@@ -45,6 +45,7 @@ def subsetConstruction(nfa: NFA, alphabet) -> DFA:
             dfaTransitionTable[frozenset(stateSet),symbol] = frozenset(newStateSet)
 
     stateMap = {}
+    
     for i, stateSet in enumerate(dfaStates):
         mapping = chr(ord('A') + i)
         stateMap[stateSet] = mapping
