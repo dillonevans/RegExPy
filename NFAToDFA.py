@@ -55,5 +55,5 @@ def subsetConstruction(nfa: NFA, alphabet) -> DFA:
         dfaTransitionTable.pop((state, input))
         dfaTransitionTable[stateMap[state], input] = stateMap[transitionState]
         
-    return DFA(stateMap[dfaStartState], dfaStates, dfaAcceptStates, dfaTransitionTable, alphabet)
+    return DFA(stateMap[dfaStartState], [stateMap[state] for state in dfaStates], dfaAcceptStates, dfaTransitionTable, alphabet)
    

@@ -14,3 +14,21 @@ class DFA:
             currentState = self.transitionFunction[currentState, symbol]
         
         return currentState in self.acceptStates
+
+    def printToFile(self):
+        f = open("DFA.dot", "w")
+        f.write("digraph G {\n")
+  
+        for state in self.states:
+            if (state not in self.acceptStates):
+                f.write(f"\t{state}[label = \"{state}\" shape = circle]\n")
+            else:
+                f.write(f"\t{state}[label = \"{state}\" shape = doublecircle]\n")
+  
+        print(self.transitionFunction)
+        for (state, input), transitionState in self.transitionFunction.items():
+            f.write(f"\t{state} -> {transitionState}[label = \"{input}\"]\n")
+
+        f.write("}")
+        f.close()
+

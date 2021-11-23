@@ -1,4 +1,4 @@
-EPS = "epsilon"
+EPS = "\u03B5"
 
 class NFA:
     def __init__(self, states, startState, acceptState) -> None:
