@@ -9,7 +9,5 @@ def isMatch(string, regex) -> bool:
     visitor = ThompsonVisitor()
 
     nfa = tree.accept(visitor)
-    print(nfa.transitionTable)
     dfa = subsetConstruction(nfa, lexer.alphabet)
-    print(dfa.transitionFunction)
     return dfa.accept(string)

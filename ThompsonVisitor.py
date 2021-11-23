@@ -46,15 +46,17 @@ class ThompsonVisitor(Visitor):
         return unionNFA
 
     def concatenate(self, left: NFA, right: NFA) -> NFA:
-        states = [*left.states, *right.states]
+        states = [*left.states, *[state for state in right.states if state != right.startState]]
         merged = NFA(states, left.startState, right.acceptState)
 
         for d in (left.transitionTable, right.transitionTable):
             for key, value in d.items():
                 for state in value:
-                    merged.addTransition(key[0], key[1], state)
+                    if (key[0] == right.startState):
+                        merged.addTransition(left.acceptState, key[1], state)
+                    else:
+                        merged.addTransition(key[0], key[1], state)
 
-        merged.addTransition(left.acceptState, EPS, right.startState)
         return merged
 
     def kleeneStarClosure(self, nfa: NFA) -> NFA:

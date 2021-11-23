@@ -5,7 +5,6 @@ class DFA:
         self.acceptStates = acceptStates
         self.transitionFunction = transitionFunction
         self.alphabet = alphabet
-        pass
 
     def accept(self, str) -> bool:
         currentState = self.startState

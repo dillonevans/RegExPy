@@ -6,7 +6,7 @@ class Parser:
     def __init__(self, lexer: Lexer) -> None:
         self.tokens = list()
         self.position = 0
-        while (lexer.hasReachedEOF() == False):
+        while (not lexer.hasReachedEOF()):
             self.tokens.append(lexer.lex())
 
     def peek(self, offset) -> Token:

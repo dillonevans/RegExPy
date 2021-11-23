@@ -11,7 +11,7 @@ def nullClosure(states: list, transitionTable):
 
     while stack:
         t = stack.pop()        
-        if ((t, EPS) in transitionTable.keys()):
+        if ((t, EPS) in transitionTable):
             for state in transitionTable[t, EPS]:
                 if (state not in closure):
                     closure.add(state)
@@ -22,7 +22,7 @@ def nullClosure(states: list, transitionTable):
 def move(stateSet, symbol, transitionTable):
     moveSet = set()
     for state in stateSet:
-        if ((state, symbol) in transitionTable.keys()):
+        if ((state, symbol) in transitionTable):
             for s in transitionTable[state, symbol]:
                 moveSet.add(s)
     return moveSet    
@@ -31,8 +31,8 @@ def subsetConstruction(nfa: NFA, alphabet) -> DFA:
     dfaStartState = frozenset(nullClosure([nfa.startState], nfa.transitionTable))
     dfaStates = [dfaStartState]
     unmarkedStates = [dfaStartState]
-    dfaTransitionTable = dict()
-    dfaAcceptStates = list()
+    dfaTransitionTable = {}
+    dfaAcceptStates = []
  
     while (unmarkedStates):
         stateSet = unmarkedStates.pop()
@@ -44,9 +44,16 @@ def subsetConstruction(nfa: NFA, alphabet) -> DFA:
                 unmarkedStates.append(newStateSet)
             dfaTransitionTable[frozenset(stateSet),symbol] = frozenset(newStateSet)
 
-    for stateSet in dfaStates:
+    stateMap = {}
+    for i, stateSet in enumerate(dfaStates):
+        mapping = chr(ord('A') + i)
+        stateMap[stateSet] = mapping
         if (nfa.acceptState in stateSet):
-            dfaAcceptStates.append(stateSet)
+            dfaAcceptStates.append(stateMap[stateSet])
 
-    return DFA(dfaStartState, dfaStates, dfaAcceptStates, dfaTransitionTable, alphabet)
+    for (state, input), transitionState in list(dfaTransitionTable.items()):
+        dfaTransitionTable.pop((state, input))
+        dfaTransitionTable[stateMap[state], input] = stateMap[transitionState]
+        
+    return DFA(stateMap[dfaStartState], dfaStates, dfaAcceptStates, dfaTransitionTable, alphabet)
    

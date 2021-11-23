@@ -39,7 +39,7 @@ class CharacterNode(SyntaxNode):
         return f"{self.char}"
 
     def accept(self, visitor: Visitor):
-        return visitor.visitCharacterNode(self)
+        return visitor.visitCharacterNode(self)     
 
 class UnaryOperatorNode(SyntaxNode):
     def __init__(self, operator: UnaryOperator, operand: SyntaxNode) -> None:

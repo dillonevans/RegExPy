@@ -7,9 +7,9 @@ class NFA:
         self.transitionTable = {}
         self.states = states
 
-    def addTransition(self, fromState, input, toState) ->None:
+    def addTransition(self, fromState, input, toState) -> None:
         stateSet = frozenset([toState])
-        if ((fromState, input) not in self.transitionTable.keys()):
+        if ((fromState, input) not in self.transitionTable):
             self.transitionTable[fromState, input] = stateSet
         else:
             self.transitionTable[fromState, input] = self.transitionTable[fromState, input].union(stateSet)

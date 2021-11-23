@@ -9,7 +9,7 @@ def formatText(text):
     formatted = ""
 
     for char in text:
-        if (char.isspace() == False):
+        if (not char.isspace()):
             current  = char
             if (current.isalpha() or current == '('):
                 if (prev.isalpha() or prev in ['*', ')', '+', '?']):
