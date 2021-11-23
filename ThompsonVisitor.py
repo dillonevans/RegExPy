@@ -46,20 +46,28 @@ class ThompsonVisitor(Visitor):
         return unionNFA
 
     def concatenate(self, left: NFA, right: NFA) -> NFA:
-        states = [*left.states, *[state for state in right.states if state != right.startState]]
+
+        concatenatedStates = [state for state in right.states if state != right.startState]
+        states = [*left.states, *concatenatedStates]
         merged = NFA(states, left.startState, right.acceptState)
 
-        print(right.acceptState)
-        for d in (left.transitionTable, right.transitionTable):
-            for key, value in d.items():
-                for state in value:
-                    if (state == right.startState):
-                        merged.addTransition(key[0], key[1], left.acceptState)
-                    elif (key[0] == right.startState):
-                        merged.addTransition(left.acceptState, key[1], state)
-                    else:
-                        merged.addTransition(key[0], key[1], state)
+        # Merge the left and right transition functions
+        for transitionTable in (left.transitionTable, right.transitionTable):
+            for (currentState, input), value in transitionTable.items():
+                for nextState in value:
+                    # Replace transitions to the right NFA's start start
+                    # with a transition to the accept state of the
+                    # left NFA
+                    if (nextState == right.startState):
+                        merged.addTransition(currentState, input, left.acceptState)
 
+                    # Consume the transitions from the start state of the right NFA
+                    elif (currentState == right.startState):
+                        merged.addTransition(left.acceptState,input, nextState)
+
+                    # Add transitions as normal
+                    else:
+                        merged.addTransition(currentState, input, nextState)
         return merged
 
     def kleeneStarClosure(self, nfa: NFA) -> NFA:
