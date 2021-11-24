@@ -1,10 +1,11 @@
-import RegExPy as REP
+from RegExPy import RegexCompiler
 import sys
 
 def main():
   argsList = sys.argv
   string, regex = argsList[1], argsList[2]   
-  print(REP.isMatch(string, regex))
-  
+  regexer = RegexCompiler(regex)
+  print(regexer.isMatch(string))
+
 if __name__ == "__main__":
   main()
