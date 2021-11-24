@@ -11,6 +11,16 @@ class RegexCompiler:
         self.nfa = self.tree.accept(self.visitor)
         self.dfa = subsetConstruction(self.nfa, self.lexer.alphabet)
         self.dfa.minimize()
-        
+
     def isMatch(self, string) -> bool:
         return self.dfa.accept(string)
+
+    def matches(self, string):
+        matchSet = set()
+
+        for i,_ in enumerate(string):
+            for j, _ in enumerate(string):
+                if (self.isMatch(string[i:j+1])):
+                    matchSet.add(string[i:j+1])
+        return matchSet
+
