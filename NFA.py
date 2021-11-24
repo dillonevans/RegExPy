@@ -24,7 +24,6 @@ class NFA:
             else:
                 f.write(f"\t{state}[label = \"{state}\" shape = doublecircle]\n")
   
-        print(self.transitionTable)
         for (state, input), stateList in self.transitionTable.items():
             for s in stateList:
                 f.write(f"\t{state} -> {s}[label = \"{input}\"]\n")

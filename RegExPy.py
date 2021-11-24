@@ -10,6 +10,7 @@ def isMatch(string, regex) -> bool:
 
     nfa = tree.accept(visitor)
     dfa = subsetConstruction(nfa, lexer.alphabet)
-    dfa.printToFile()
     nfa.printNFA()
+    dfa.minimize()
+    dfa.printToFile()
     return dfa.accept(string)

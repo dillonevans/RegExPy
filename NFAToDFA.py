@@ -16,7 +16,6 @@ def nullClosure(states: list, transitionTable):
                 if (state not in closure):
                     closure.add(state)
                     stack.append(state)
-
     return closure
 
 def move(stateSet, symbol, transitionTable):
@@ -47,7 +46,7 @@ def subsetConstruction(nfa: NFA, alphabet) -> DFA:
     stateMap = {}
     
     for i, stateSet in enumerate(dfaStates):
-        mapping = chr(ord('A') + i)
+        mapping = chr(65 + i)
         stateMap[stateSet] = mapping
         if (nfa.acceptState in stateSet):
             dfaAcceptStates.append(stateMap[stateSet])
