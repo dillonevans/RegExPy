@@ -1,3 +1,6 @@
+from os import name
+
+
 class DFA:
     def __init__(self, startState, states, acceptStates, transitionFunction, alphabet) -> None:
         self.startState = startState
@@ -32,32 +35,39 @@ class DFA:
         f.close()
 
     def minimize(self):
-        index = 0
+        """Minimizes the DFA"""
+        
         transitionTablePrime, nameMap = {}, {}
         statesPrime, acceptStatesPrime = [], []
+        
+        # Generate the equivalence class [p] for all p ∈ Q.
+        # The code in this section is based on the algorithm 
+        # described here: http://www.cs.cornell.edu/courses/cs2800/2013fa/Handouts/minimization.pdf
         equivalenceClass = self.generateEquivalenceClasses()
 
-        # Assign a unique identifier to each equivalence class
-        for (state,_) in self.transitionFunction:
-            statePrime = equivalenceClass[state]
-            if (statePrime not in nameMap):
-                nameMap[statePrime] = f"q_{index}"
-                statesPrime.append(nameMap[statePrime])
-                index += 1
+        # Generate a unique identifier for each equivalence class. 
+        # This step is not necessary, but allows for easy to 
+        # read state names in the minmized DFA
+        nameMap = {equivalenceClass[state]: f"q_{i}" for (i, state) in enumerate(self.states)}
 
-        acceptStatesPrime = []
-        transitionTablePrime = {}
+        # Generate the new set of states and accept states, as well as the
+        # new transition function
+        for state in self.states:
 
-        # Construct the new transition table using the equivalence classes
-        # of the original states as well as the new set of 
-        # accept states 
-        for (p,input), q in self.transitionFunction.items():
-            pPrime = equivalenceClass[p]
-            qPrime = equivalenceClass[q]
-            if (set(self.acceptStates).intersection(pPrime)):
-                if (nameMap[pPrime] not in acceptStatesPrime):
-                    acceptStatesPrime.append(nameMap[pPrime])
-            transitionTablePrime[nameMap[pPrime],input] = nameMap[qPrime]
+            # We define the new states set of states
+            # Q' as {[p] | p ∈ Q}
+            statePrime = nameMap[equivalenceClass[state]]
+            statesPrime.append(statePrime)
+            
+            # We define the new set of accept states 
+            # F' as {[p] | p ∈ F}.
+            if (state in self.acceptStates):
+                acceptStatesPrime.append(statePrime)
+
+            # We define the new transition function 
+            # δ' as δ'([p], a) [δ(p, a)],
+            for a in self.alphabet:
+                transitionTablePrime[statePrime, a] = nameMap[equivalenceClass[self.transitionFunction[state, a]]]
 
         # Set M to M'
         self.acceptStates = acceptStatesPrime
@@ -71,17 +81,28 @@ class DFA:
         # Find distinguishable pairs
         for (p, _) in self.transitionFunction:
             for (q, _) in self.transitionFunction:
-                isDistinguishable = (p in self.acceptStates and q not in self.acceptStates) or (p not in self.acceptStates and q in self.acceptStates)
-                distinguishable[p,q] = isDistinguishable
+
+                # If p and q are the same state, then they are obviously not distinguishable
+                if (p == q):
+                    distinguishable[p,q] = False
+                
+                else:
+                    # If p is an accept state and q is not, or vice versa, we can 
+                    # automatically classify them as being distinguishable
+                    # since only one is an accept state
+                    isDistinguishable = (p in self.acceptStates and q not in self.acceptStates) or (p not in self.acceptStates and q in self.acceptStates)
+                    distinguishable[p,q] = isDistinguishable
 
         # Keep marking until there are no more distinguishable states
         foundDistinguishablePair = True
+        
         while (foundDistinguishablePair):
             foundDistinguishablePair = False
             for (p,q) in distinguishable:
                 for input in self.alphabet:
                     moveP = self.transitionFunction[p,input]
                     moveQ = self.transitionFunction[q,input]
+
                     if (not distinguishable[p,q] and distinguishable[moveP, moveQ]):
                         distinguishable[p,q] = True
                         foundDistinguishablePair = True
