@@ -55,17 +55,17 @@ class DFA:
         for state in self.states:
 
             # We define the new states set of states
-            # Q' as {[p] | p ∈ Q}
+            # Q' as {[p] | p ∈ Q }.
             statePrime = nameMap[equivalenceClass[state]]
             statesPrime.append(statePrime)
             
             # We define the new set of accept states 
-            # F' as {[p] | p ∈ F}.
+            # F' as {[p] | p ∈ F }.
             if (state in self.acceptStates):
                 acceptStatesPrime.append(statePrime)
 
             # We define the new transition function 
-            # δ' as δ'([p], a) [δ(p, a)],
+            # δ' as δ'([p], a) = [δ(p, a)]
             for a in self.alphabet:
                 transitionTablePrime[statePrime, a] = nameMap[equivalenceClass[self.transitionFunction[state, a]]]
 
@@ -79,8 +79,8 @@ class DFA:
         distinguishable = {}
 
         # Find distinguishable pairs
-        for (p, _) in self.transitionFunction:
-            for (q, _) in self.transitionFunction:
+        for p in self.states:
+            for q in self.states:
 
                 # If p and q are the same state, then they are obviously not distinguishable
                 if (p == q):
