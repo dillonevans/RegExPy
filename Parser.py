@@ -1,13 +1,16 @@
+from re import match
 from Lexer import Lexer
-from SyntaxNode import BinaryOperator, BinaryOperatorNode, CharacterNode, SyntaxNode, UnaryOperator, UnaryOperatorNode
+from SyntaxNode import BinaryOperator, BinaryOperatorNode, CharacterNode, RepetitionQuantifierNode, SyntaxNode, UnaryOperator, UnaryOperatorNode
 from Token import Token, TokenType
 
 class Parser:
     def __init__(self, lexer: Lexer) -> None:
-        self.tokens = list()
+        self.tokens = []
         self.position = 0
         while (not lexer.hasReachedEOF()):
             self.tokens.append(lexer.lex())
+
+        print([token.type for token in self.tokens])
 
     def peek(self, offset) -> Token:
         index = self.position + offset
@@ -56,18 +59,36 @@ class Parser:
             return tree
 
     def parsePostfix(self) -> SyntaxNode:
-            node = self.parsePrimary()
+        node = self.parsePrimary()
+        tokenType = self.getCurrentToken().type 
+        min, max = 0,0
+        if (tokenType == TokenType.LEFT_BRACE_TOKEN):
+            self.match(TokenType.LEFT_BRACE_TOKEN)
+            if (self.getCurrentToken().type == TokenType.NUMERIC):
+                min = int(self.match(TokenType.NUMERIC).text)
+                if (self.getCurrentToken().type != TokenType.COMMA_TOKEN):
+                    self.match(TokenType.RIGHT_BRACE_TOKEN)
+                    return RepetitionQuantifierNode(min, min, node)
+            
+            self.match(TokenType.COMMA_TOKEN)
+
+            if (self.getCurrentToken().type == TokenType.NUMERIC):
+                max = int(self.match(TokenType.NUMERIC).text)
+            else:
+                max = None
+            self.match(TokenType.RIGHT_BRACE_TOKEN)
+            return RepetitionQuantifierNode(min,max, node)
+
+        while(tokenType in [TokenType.KLEENE_CLOSURE_TOKEN, TokenType.KLEENE_PLUS_TOKEN, TokenType.QUESTION_TOKEN]):
+            if (tokenType == TokenType.KLEENE_CLOSURE_TOKEN):
+                node = UnaryOperatorNode(UnaryOperator.KLEENE_STAR, node)
+            elif (tokenType == TokenType.QUESTION_TOKEN):
+                node = UnaryOperatorNode(UnaryOperator.QUESTION, node)
+            else:
+                node = UnaryOperatorNode(UnaryOperator.KLEENE_PLUS, node)
+            self.match(tokenType)
             tokenType = self.getCurrentToken().type 
-            while(tokenType in [TokenType.KLEENE_CLOSURE_TOKEN, TokenType.KLEENE_PLUS_TOKEN, TokenType.QUESTION_TOKEN]):
-                if (tokenType == TokenType.KLEENE_CLOSURE_TOKEN):
-                    node = UnaryOperatorNode(UnaryOperator.KLEENE_STAR, node)
-                elif (tokenType == TokenType.QUESTION_TOKEN):
-                    node = UnaryOperatorNode(UnaryOperator.QUESTION, node)
-                else:
-                    node = UnaryOperatorNode(UnaryOperator.KLEENE_PLUS, node)
-                self.match(tokenType)
-                tokenType = self.getCurrentToken().type 
-            return node
+        return node
 
     def parseExpression(self, minPrecedence: int) -> SyntaxNode:
         left = self.parsePostfix()

@@ -11,6 +11,8 @@ class RegexCompiler:
         self.nfa = self.tree.accept(self.visitor)
         self.dfa = subsetConstruction(self.nfa, self.lexer.alphabet)
         self.dfa.minimize()
+        self.dfa.printToFile()
+        self.nfa.printNFA()
 
     def isMatch(self, string) -> bool:
         return self.dfa.accept(string)

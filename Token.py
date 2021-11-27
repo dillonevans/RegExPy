@@ -2,14 +2,17 @@ from enum import Enum
 
 class TokenType(Enum):
     CHARACTER = 1
-    UNION_TOKEN = 2
-    KLEENE_CLOSURE_TOKEN = 3,
-    KLEENE_PLUS_TOKEN = 4,
-    CONCATENATION_TOKEN = 5,
-    QUESTION_TOKEN = 6,
-    LEFT_PARENTHESIS_TOKEN = 7,
-    RIGHT_PARENTHESIS_TOKEN = 8
-
+    NUMERIC = 2
+    UNION_TOKEN = 3
+    KLEENE_CLOSURE_TOKEN = 4
+    KLEENE_PLUS_TOKEN = 5
+    CONCATENATION_TOKEN = 6
+    QUESTION_TOKEN = 7
+    LEFT_PARENTHESIS_TOKEN = 8
+    RIGHT_PARENTHESIS_TOKEN = 9
+    LEFT_BRACE_TOKEN = 10
+    RIGHT_BRACE_TOKEN = 11
+    COMMA_TOKEN = 12
 
 class Token:
     def __init__(self, text: str, type: TokenType ) -> None:

@@ -7,18 +7,23 @@ CONCAT_OPERATOR = '\u2022'
 def formatText(text):
     current, prev = '', ''
     formatted = ""
+    isInBraces = False
 
     for char in text:
         if (not char.isspace()):
             current  = char
-            if (current.isalpha() or current == '('):
-                if (prev.isalpha() or prev in ['*', ')', '+', '?']):
-                    formatted =  f"{formatted}{CONCAT_OPERATOR}{current}"
-                else:
-                    formatted += current
-            else:
-                formatted += current
+            if (current.isalpha() or current == '(' or current.isdigit()):
+                if (prev.isalpha() or prev.isdigit() or prev in ['*', ')', '+', '?', '}', ',']):
+                    if (not isInBraces):
+                        formatted =  f"{formatted}{CONCAT_OPERATOR}"
+                    
+            formatted += current
             prev = current
+
+            if (prev == '{'):
+                isInBraces = True
+            elif (prev == '}'):
+                isInBraces = False
     print(formatted)
     return formatted
 
@@ -41,15 +46,23 @@ class Lexer:
 
     def lex(self) -> Token:
         self.skipWhiteSpace()
-
+        start = self.position
         current = self.getCurrentChar()
-        self.advance()
+        
         if current.isalpha():
+            self.advance()
             if current not in self.alphabet:
                 self.alphabet.append(current)
             return Token(current, TokenType.CHARACTER)
 
+        if (current.isdigit()):
+            while (current.isdigit()):
+                self.advance()
+                current = self.getCurrentChar()
+            lexeme = self.text[start:self.position]
+            return Token(lexeme, TokenType.NUMERIC)
         else:
+            self.advance()
             if current == '*':
                 return Token(current, TokenType.KLEENE_CLOSURE_TOKEN)
             elif current == '+':
@@ -64,6 +77,12 @@ class Lexer:
                 return Token(current, TokenType.LEFT_PARENTHESIS_TOKEN)
             elif current == ')':
                 return Token(current, TokenType.RIGHT_PARENTHESIS_TOKEN)
+            elif current == '{':
+                return Token(current, TokenType.LEFT_BRACE_TOKEN)
+            elif current == '}':
+                return Token(current, TokenType.RIGHT_BRACE_TOKEN)
+            elif current == ',':
+                return Token(current, TokenType.COMMA_TOKEN)
             elif current == '\0':
                 return Token(current, -1)
         

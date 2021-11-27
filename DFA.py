@@ -1,6 +1,3 @@
-from os import name
-
-
 class DFA:
     def __init__(self, startState, states, acceptStates, transitionFunction, alphabet) -> None:
         self.startState = startState
@@ -48,7 +45,7 @@ class DFA:
         # Generate a unique identifier for each equivalence class. 
         # This step is not necessary, but allows for easy to 
         # read state names in the minmized DFA
-        nameMap = {equivalenceClass[state]: f"q_{i}" for (i, state) in enumerate(self.states)}
+        nameMap = {equivalenceSet: f"q_{i}" for (i, equivalenceSet) in enumerate(set(equivalenceClass.values()))}
 
         # Generate the new set of states and accept states, as well as the
         # new transition function
@@ -83,7 +80,7 @@ class DFA:
             for q in self.states:
 
                 # If p and q are the same state, then they are obviously not distinguishable
-                if (p == q):
+                if (p is q):
                     distinguishable[p,q] = False
                 
                 else:
@@ -102,7 +99,7 @@ class DFA:
                 for input in self.alphabet:
                     moveP = self.transitionFunction[p,input]
                     moveQ = self.transitionFunction[q,input]
-
+            
                     if (not distinguishable[p,q] and distinguishable[moveP, moveQ]):
                         distinguishable[p,q] = True
                         foundDistinguishablePair = True

@@ -1,3 +1,4 @@
+import enum
 from Visitor import Visitor
 from NFA import EPS, NFA
 from SyntaxNode import *
@@ -27,6 +28,39 @@ class ThompsonVisitor(Visitor):
             return self.question(node.operand.accept(self))
         else:
             return self.kleenePlus(node.operand.accept(self))
+
+    def visitRepetitionQuantifierNode(self, node: RepetitionQuantifierNode) -> NFA:
+        if (node.operator == UnaryOperator.BOUNDED_MIN_BOUNDED_MAX_REPETITION):
+            return self.repetition(node)
+        else:            
+            nfa = node.operand.accept(self)
+            for _ in range (node.min - 1):
+                nfa = self.concatenate(nfa, node.operand.accept(self))
+            return self.concatenate(nfa, self.kleeneStarClosure(node.operand.accept(self)))
+
+    def repetition(self, node) -> NFA:
+        nfaList = []
+
+        for i in range(0, node.max - node.min + 1):
+            nfa = node.operand.accept(self)
+            for _ in range(0, node.min + i - 1):
+                nfa = self.concatenate(nfa, node.operand.accept(self))
+            nfaList.append(nfa)
+
+        startState, acceptState = self.stateNum, self.stateNum + 1
+        self.stateNum += 2
+
+        states = [*[state for nfa in nfaList for state in nfa.states], startState, acceptState]
+        unionNFA = NFA(states, startState, acceptState)
+
+        for nfa in (nfaList):
+            for (state, input), stateSet in nfa.transitionTable.items():
+                unionNFA.transitionTable[state, input] = stateSet
+
+            unionNFA.addTransition(startState, EPS, nfa.startState)
+            unionNFA.addTransition(nfa.acceptState, EPS, acceptState)
+
+        return unionNFA
     
     def union(self, left, right) -> NFA:
         startState, acceptState = self.stateNum, self.stateNum + 1
@@ -35,9 +69,8 @@ class ThompsonVisitor(Visitor):
         unionNFA = NFA(states, startState, acceptState)
 
         for d in (left.transitionTable, right.transitionTable):
-            for key, value in d.items():
-                for state in value:
-                    unionNFA.addTransition(key[0], key[1], state)
+            for (state, input), stateSet in d.items():
+                unionNFA.transitionTable[state, input] = stateSet
 
         unionNFA.addTransition(startState, EPS, left.startState)
         unionNFA.addTransition(startState, EPS, right.startState)
@@ -77,8 +110,7 @@ class ThompsonVisitor(Visitor):
         closureNFA = NFA(states, closureStartState, closureAcceptState)
 
         for key, value in nfa.transitionTable.items():
-            for state in value:
-                closureNFA.addTransition(key[0], key[1], state)
+            closureNFA.transitionTable[key] = value
 
         closureNFA.addTransition(closureStartState, EPS, nfa.startState)
         closureNFA.addTransition(closureStartState, EPS, closureAcceptState)
