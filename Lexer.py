@@ -3,35 +3,11 @@ from Token import Token, TokenType
 
 CONCAT_OPERATOR = '\u2022'
 
-# Handle implicit Concatenations
-def formatText(text):
-    current, prev = '', ''
-    formatted = ""
-    isInBraces = False
-
-    for char in text:
-        if (not char.isspace()):
-            current  = char
-            if (current.isalpha() or current == '(' or current.isdigit()):
-                if (prev.isalpha() or prev.isdigit() or prev in ['*', ')', '+', '?', '}', ',']):
-                    if (not isInBraces):
-                        formatted =  f"{formatted}{CONCAT_OPERATOR}"
-                    
-            formatted += current
-            prev = current
-
-            if (prev == '{'):
-                isInBraces = True
-            elif (prev == '}'):
-                isInBraces = False
-    print(formatted)
-    return formatted
-
 class Lexer:
     def __init__(self, text: str) -> None:
         self.text = text
         self.position = 0
-        self.text = formatText(text)
+        self.text = text
         self.alphabet = []
 
     def getCurrentChar(self) -> chr:
@@ -83,8 +59,18 @@ class Lexer:
                 return Token(current, TokenType.RIGHT_BRACE_TOKEN)
             elif current == ',':
                 return Token(current, TokenType.COMMA_TOKEN)
+            elif current == '[':
+                return Token(current, TokenType.LEFT_BRACKET)
+            elif current == ']':
+                return Token(current, TokenType.RIGHT_BRACKET)
+            elif current == '-':
+                min = self.peek(-2)
+                max = self.peek(0)
+                for i in range(ord(min), ord(max) + 1):
+                    self.alphabet.append(chr(i))
+                return Token(current, TokenType.RANGE_TOKEN)
             elif current == '\0':
-                return Token(current, -1)
+                return Token(current, TokenType.EOF_TOKEN)
         
     def advance(self):
         self.position += 1

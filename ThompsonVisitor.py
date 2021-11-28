@@ -38,6 +38,48 @@ class ThompsonVisitor(Visitor):
                 nfa = self.concatenate(nfa, node.operand.accept(self))
             return self.concatenate(nfa, self.kleeneStarClosure(node.operand.accept(self)))
 
+    def visitCharacterClassNode(self, node: CharacterClassNode) -> NFA:
+        nfaList = []
+
+        for characterNode in node.characters:
+            nfaList.append(characterNode.accept(self))
+
+        startState, acceptState = self.stateNum, self.stateNum + 1
+        self.stateNum += 2
+
+        states = [*[state for nfa in nfaList for state in nfa.states], startState, acceptState]
+        unionNFA = NFA(states, startState, acceptState)
+
+        for nfa in (nfaList):
+            for (state, input), stateSet in nfa.transitionTable.items():
+                unionNFA.transitionTable[state, input] = stateSet
+
+            unionNFA.addTransition(startState, EPS, nfa.startState)
+            unionNFA.addTransition(nfa.acceptState, EPS, acceptState)
+
+        return unionNFA
+
+    def visitRangeNode(self, node: RangeNode):
+        nfaList = []
+
+        for characterNode in node.nodes:
+            nfaList.append(characterNode.accept(self))
+
+        startState, acceptState = self.stateNum, self.stateNum + 1
+        self.stateNum += 2
+
+        states = [*[state for nfa in nfaList for state in nfa.states], startState, acceptState]
+        unionNFA = NFA(states, startState, acceptState)
+
+        for nfa in (nfaList):
+            for (state, input), stateSet in nfa.transitionTable.items():
+                unionNFA.transitionTable[state, input] = stateSet
+
+            unionNFA.addTransition(startState, EPS, nfa.startState)
+            unionNFA.addTransition(nfa.acceptState, EPS, acceptState)
+
+        return unionNFA
+
     def repetition(self, node) -> NFA:
         nfaList = []
 

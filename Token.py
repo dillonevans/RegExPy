@@ -12,7 +12,11 @@ class TokenType(Enum):
     RIGHT_PARENTHESIS_TOKEN = 9
     LEFT_BRACE_TOKEN = 10
     RIGHT_BRACE_TOKEN = 11
-    COMMA_TOKEN = 12
+    COMMA_TOKEN = 12,
+    LEFT_BRACKET = 13,
+    RIGHT_BRACKET = 14,
+    RANGE_TOKEN = 15,
+    EOF_TOKEN = 16
 
 class Token:
     def __init__(self, text: str, type: TokenType ) -> None:

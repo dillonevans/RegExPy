@@ -13,7 +13,7 @@ class SyntaxNode(ABC):
 
 class BinaryOperator(Enum):
     UNION = '|'
-    CONCATENATION= '?'
+    CONCATENATION= '\u2022'
 
 class UnaryOperator(Enum):
     KLEENE_STAR = '*',
@@ -55,7 +55,6 @@ class UnaryOperatorNode(SyntaxNode):
     def accept(self, visitor: Visitor):
         return visitor.visitUnaryOperatorNode(self)
 
-
 class RepetitionQuantifierNode(UnaryOperatorNode):
     def __init__(self, min, max, operand: SyntaxNode) -> None:
         self.min = min
@@ -74,4 +73,27 @@ class RepetitionQuantifierNode(UnaryOperatorNode):
     def accept(self, visitor: Visitor):
         return visitor.visitRepetitionQuantifierNode(self)
 
+class CharacterClassNode(SyntaxNode):
+    def __init__(self, characters) -> None:
+        self.characters = characters
+    
+    def __str__(self) -> str:
+       return f"{self.operand}{self.operator.value}" 
 
+    def accept(self, visitor: Visitor):
+        return visitor.visitCharacterClassNode(self)
+
+class RangeNode(SyntaxNode):
+    def __init__(self, min, max) -> None:
+        self.min = min
+        self.max = max
+        self.nodes = []
+        for i in range(ord(max) - ord(min) + 1):
+            self.nodes.append(CharacterNode(chr(ord(min) + i)))
+        
+
+    def __str__(self) -> str:
+       return f"{self.nodes}"
+
+    def accept(self, visitor: Visitor):
+        return visitor.visitRangeNode(self)
