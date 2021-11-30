@@ -59,14 +59,11 @@ class RepetitionQuantifierNode(UnaryOperatorNode):
     def __init__(self, min, max, operand: SyntaxNode) -> None:
         self.min = min
         self.max = max
-        type = None
         if (not max):
-            type = UnaryOperator.UNBOUNDED_MAX_REPETITION
+             super().__init__(UnaryOperator.UNBOUNDED_MAX_REPETITION, operand)
         else:
-            type = UnaryOperator.BOUNDED_MIN_BOUNDED_MAX_REPETITION
+            super().__init__(UnaryOperator.BOUNDED_MIN_BOUNDED_MAX_REPETITION, operand)
                 
-        super().__init__(type, operand)
-
     def __str__(self) -> str:
         return f"{self.operand}{self.operator.value}"
 
@@ -91,7 +88,6 @@ class RangeNode(SyntaxNode):
         for i in range(ord(max) - ord(min) + 1):
             self.nodes.append(CharacterNode(chr(ord(min) + i)))
         
-
     def __str__(self) -> str:
        return f"{self.nodes}"
 

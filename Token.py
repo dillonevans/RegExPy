@@ -1,8 +1,8 @@
 from enum import Enum
 
 class TokenType(Enum):
-    CHARACTER = 1
-    NUMERIC = 2
+    CHARACTER_TOKEN = 1
+    NUMERIC_TOKEN = 2
     UNION_TOKEN = 3
     KLEENE_CLOSURE_TOKEN = 4
     KLEENE_PLUS_TOKEN = 5
@@ -13,8 +13,8 @@ class TokenType(Enum):
     LEFT_BRACE_TOKEN = 10
     RIGHT_BRACE_TOKEN = 11
     COMMA_TOKEN = 12,
-    LEFT_BRACKET = 13,
-    RIGHT_BRACKET = 14,
+    LEFT_BRACKET_TOKEN = 13,
+    RIGHT_BRACKET_TOKEN = 14,
     RANGE_TOKEN = 15,
     EOF_TOKEN = 16
 

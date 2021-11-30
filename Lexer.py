@@ -8,7 +8,7 @@ class Lexer:
         self.text = text
         self.position = 0
         self.text = text
-        self.alphabet = []
+        self.alphabet = set()
 
     def getCurrentChar(self) -> chr:
         return self.peek(0)
@@ -27,16 +27,15 @@ class Lexer:
         
         if current.isalpha():
             self.advance()
-            if current not in self.alphabet:
-                self.alphabet.append(current)
-            return Token(current, TokenType.CHARACTER)
+            self.alphabet.add(current)
+            return Token(current, TokenType.CHARACTER_TOKEN)
 
         if (current.isdigit()):
             while (current.isdigit()):
                 self.advance()
                 current = self.getCurrentChar()
             lexeme = self.text[start:self.position]
-            return Token(lexeme, TokenType.NUMERIC)
+            return Token(lexeme, TokenType.NUMERIC_TOKEN)
         else:
             self.advance()
             if current == '*':
@@ -60,14 +59,14 @@ class Lexer:
             elif current == ',':
                 return Token(current, TokenType.COMMA_TOKEN)
             elif current == '[':
-                return Token(current, TokenType.LEFT_BRACKET)
+                return Token(current, TokenType.LEFT_BRACKET_TOKEN)
             elif current == ']':
-                return Token(current, TokenType.RIGHT_BRACKET)
+                return Token(current, TokenType.RIGHT_BRACKET_TOKEN)
             elif current == '-':
                 min = self.peek(-2)
                 max = self.peek(0)
                 for i in range(ord(min), ord(max) + 1):
-                    self.alphabet.append(chr(i))
+                    self.alphabet.add(chr(i))
                 return Token(current, TokenType.RANGE_TOKEN)
             elif current == '\0':
                 return Token(current, TokenType.EOF_TOKEN)

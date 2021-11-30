@@ -28,7 +28,7 @@ class RecursiveDescentParser:
         else:
             raise SyntaxError()
 
-    def parseMetacharacter(self, tree):
+    def parsePostfix(self, tree):
         lookAhead = self.getCurrentToken().type
         min, max = 0, 0
         if (lookAhead == TokenType.KLEENE_CLOSURE_TOKEN):
@@ -42,16 +42,16 @@ class RecursiveDescentParser:
             return UnaryOperatorNode(UnaryOperator.QUESTION, tree)
         elif (lookAhead == TokenType.LEFT_BRACE_TOKEN):
             self.match(TokenType.LEFT_BRACE_TOKEN)
-            if (self.getCurrentToken().type == TokenType.NUMERIC):
-                min = int(self.match(TokenType.NUMERIC).text)
+            if (self.getCurrentToken().type == TokenType.NUMERIC_TOKEN):
+                min = int(self.match(TokenType.NUMERIC_TOKEN).text)
                 if (self.getCurrentToken().type != TokenType.COMMA_TOKEN):
                     self.match(TokenType.RIGHT_BRACE_TOKEN)
                     return RepetitionQuantifierNode(min, min, tree)
             
             self.match(TokenType.COMMA_TOKEN)
 
-            if (self.getCurrentToken().type == TokenType.NUMERIC):
-                max = int(self.match(TokenType.NUMERIC).text)
+            if (self.getCurrentToken().type == TokenType.NUMERIC_TOKEN):
+                max = int(self.match(TokenType.NUMERIC_TOKEN).text)
             else:
                 max = None
             self.match(TokenType.RIGHT_BRACE_TOKEN)
@@ -65,12 +65,12 @@ class RecursiveDescentParser:
             tree = self.parseExpression()
             self.match(TokenType.RIGHT_PARENTHESIS_TOKEN)
             return tree
-        elif (lookAhead == TokenType.LEFT_BRACKET):
+        elif (lookAhead == TokenType.LEFT_BRACKET_TOKEN):
             self.match(lookAhead)
             tree = self.parseCharacterClass()
-            self.match(TokenType.RIGHT_BRACKET)
+            self.match(TokenType.RIGHT_BRACKET_TOKEN)
             return tree
-        char = self.match(TokenType.CHARACTER).text
+        char = self.match(TokenType.CHARACTER_TOKEN).text
         return CharacterNode(char)
 
     def parseFactor(self):
@@ -81,21 +81,21 @@ class RecursiveDescentParser:
             lookAhead == TokenType.KLEENE_PLUS_TOKEN or
             lookAhead == TokenType.QUESTION_TOKEN or
             lookAhead == TokenType.LEFT_BRACE_TOKEN):
-            return self.parseMetacharacter(atom)
+            return self.parsePostfix(atom)
         return atom
 
     def parseCharacterRange(self):
-        beginChar = self.match(TokenType.CHARACTER).text
+        beginChar = self.match(TokenType.CHARACTER_TOKEN).text
         lookAhead = self.getCurrentToken().type
         if (lookAhead == TokenType.RANGE_TOKEN):
             self.match(lookAhead)
-            endChar = self.match(TokenType.CHARACTER).text
+            endChar = self.match(TokenType.CHARACTER_TOKEN).text
             return RangeNode(beginChar, endChar)
         return CharacterNode(beginChar)
         
     def parseCharacterClass(self):
         characters = []
-        while (self.getCurrentToken().type is not TokenType.RIGHT_BRACKET):
+        while (self.getCurrentToken().type is not TokenType.RIGHT_BRACKET_TOKEN):
             range = self.parseCharacterRange()
             characters.append(range)
         return CharacterClassNode(characters)
@@ -104,9 +104,9 @@ class RecursiveDescentParser:
         factor = self.parseFactor()
         lookAhead = self.getCurrentToken().type
         
-        if (lookAhead == TokenType.CHARACTER or 
+        if (lookAhead == TokenType.CHARACTER_TOKEN or 
             lookAhead == TokenType.LEFT_PARENTHESIS_TOKEN or
-            lookAhead == TokenType.LEFT_BRACKET):
+            lookAhead == TokenType.LEFT_BRACKET_TOKEN):
             return BinaryOperatorNode(factor, BinaryOperator.CONCATENATION, self.parseTerm())
         elif (lookAhead == TokenType.EOF_TOKEN):
             return factor
